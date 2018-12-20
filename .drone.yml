@@ -84,6 +84,25 @@ pipeline:
       local: false
       event: [ push ]
 
+  update-search-index:
+    image: algolia/docsearch-scraper
+    entrypoint: ""
+    pull: true
+    secrets: [ 
+      algolia_app_id, algolia_config, 
+      algolia_index_name, algolia_search_api_key, 
+      algolia_write_api_key 
+    ]
+    environment:
+      - ALGOLIA_APP_ID=${ALGOLIA_APP_ID}
+      - ALGOLIA_API_KEY=${ALGOLIA_SEARCH_API_KEY}
+      - APPLICATION_ID=${ALGOLIA_APP_ID}
+      - API_KEY=${ALGOLIA_WRITE_API_KEY}
+      - ALGOLIA_INDEX_NAME=${ALGOLIA_INDEX_NAME}
+      - CONFIG=${ALGOLIA_CONFIG}
+    commands:
+      - pipenv run python -m src.index
+
   notify-slack:
     image: plugins/slack
     secrets: [ slack_webhook ]
@@ -92,3 +111,5 @@ pipeline:
       local: false
       event: [ push ]
       status: [ success, failure ]
+
+
